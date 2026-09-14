@@ -1177,68 +1177,115 @@ img{ max-width:100%; display:block; }
    ============================================================ */
 .question-scene-inner{ gap: 1.1rem; }
 
-.bunny{
-  position:relative;
-  width: min(56vw, 210px);
-  aspect-ratio: 120/118;
-  filter: drop-shadow(0 14px 22px rgba(0,0,0,0.4));
+.bunny {
+  position: relative;
+  width: min(60vw, 240px);
+  aspect-ratio: 1;
 }
-.bunny-svg{ width:100%; height:100%; overflow:visible; }
-.bunny-ear-outer{
-  fill: url(#bunnyEarOuterGrad);
-  stroke: var(--color-gold-light);
-  stroke-width: 2.2;
+
+.bunny-sprite {
+  width: 100%; 
+  height: 100%; 
+  animation: floatBunny 4s ease-in-out infinite;
+  transform-origin: bottom center;
 }
-.bunny-ear-inner{
-  fill: var(--color-rose);
-  opacity: 0.55;
+
+@keyframes floatBunny {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
 }
-.bunny-head{
-  fill: url(#bunnyHeadGrad);
-  stroke: var(--color-gold-light);
-  stroke-width: 2.4;
+
+.bunny-svg { 
+  width: 100%; 
+  height: 100%; 
+  overflow: visible; 
 }
-.bunny-highlight{
-  fill: #ffffff;
-  opacity: 0.55;
+
+.bunny-glow {
+  filter: drop-shadow(0 15px 25px rgba(255, 182, 193, 0.25));
 }
-.bunny-blush{
-  fill: var(--color-rose);
-  opacity: 0.55;
-}
-.bunny-eye-closed{
-  fill:none;
-  stroke: var(--color-rose-deep);
-  stroke-width: 3;
-  stroke-linecap: round;
+
+/* Default hidden layers */
+.bunny-eyes-sad,
+.bunny-tears,
+.bunny-mouth-sad,
+.bunny-eyes-kiss,
+.bunny-mouth-kiss {
   opacity: 0;
-  transition: opacity 0.4s ease 0.25s;
+  transition: opacity 0.3s ease;
 }
-.bunny.peeking .bunny-eye-closed{ opacity: 1; }
-.bunny-nose{
-  fill: var(--color-rose-deep);
-  opacity: 0.85;
+
+/* Default visible layers */
+.bunny-eyes-open,
+.bunny-mouth-smile {
+  opacity: 1;
+  transition: opacity 0.3s ease;
 }
-.bunny-paw-group{
-  transform-box: fill-box;
+
+/* --- SAD STATE (Dodging NO) --- */
+.bunny.sad .bunny-sprite {
+  animation: shiverBunny 0.4s ease-in-out infinite;
+}
+@keyframes shiverBunny {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-3px, 1px); }
+  50% { transform: translate(3px, -1px); }
+  75% { transform: translate(-3px, 2px); }
+}
+
+.bunny.sad .bunny-eyes-open { opacity: 0; }
+.bunny.sad .bunny-mouth-smile { opacity: 0; }
+.bunny.sad .bunny-eyes-sad { opacity: 1; }
+.bunny.sad .bunny-tears { opacity: 1; }
+.bunny.sad .bunny-mouth-sad { opacity: 1; }
+.bunny.sad .bunny-puddle { rx: 50px; opacity: 0.7; }
+
+.bunny-ear-l, .bunny-ear-r { transition: transform 0.5s var(--ease-soft); }
+.bunny-ear-l { transform-origin: 70px 90px; }
+.bunny-ear-r { transform-origin: 130px 90px; }
+.bunny.sad .bunny-ear-l { transform: rotate(-35deg); }
+.bunny.sad .bunny-ear-r { transform: rotate(35deg); }
+
+.tear-stream {
+  stroke-dasharray: 6 6;
+  stroke-dashoffset: 0;
+  animation: tearFlow 0.5s linear infinite;
+}
+@keyframes tearFlow { to { stroke-dashoffset: -12; } }
+
+.bunny-puddle {
+  transition: rx 2.5s ease-out, opacity 1s ease-in;
+}
+
+/* --- KISS / HAPPY STATE (YES Clicked) --- */
+.bunny.kiss .bunny-sprite {
+  animation: jumpBunny 0.6s cubic-bezier(0.28, 0.84, 0.42, 1) infinite;
+}
+@keyframes jumpBunny {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-30px) scaleY(1.05); }
+}
+
+.bunny.kiss .bunny-eyes-open { opacity: 0; }
+.bunny.kiss .bunny-mouth-smile { opacity: 0; }
+.bunny.kiss .bunny-eyes-sad { opacity: 0; }
+.bunny.kiss .bunny-tears { opacity: 0; }
+.bunny.kiss .bunny-mouth-sad { opacity: 0; }
+.bunny.kiss .bunny-puddle { opacity: 0; transition: opacity 0.2s; }
+
+.bunny.kiss .bunny-eyes-kiss { opacity: 1; }
+.bunny.kiss .bunny-mouth-kiss { opacity: 1; }
+
+.bunny.kiss .bunny-ear-l { transform: rotate(8deg); }
+.bunny.kiss .bunny-ear-r { transform: rotate(-8deg); }
+
+.bunny-paw-group {
+  transition: transform 0.4s var(--ease-soft);
   transform-origin: top center;
-  transition: transform 0.5s var(--ease-soft);
 }
-.bunny-paw{
-  fill: url(#bunnyPawGrad);
-  stroke: var(--color-gold-light);
-  stroke-width: 2.2;
-}
-.bunny-paw-seam{
-  fill: none;
-  stroke: rgba(197,58,92,0.35);
-  stroke-width: 1.6;
-  stroke-linecap: round;
-}
-.bunny.peeking #bunny-paw-left,
-.bunny.peeking #bunny-paw-right{
-  transform: translateY(14px) rotate(-8deg);
-}
+.bunny.kiss #bunny-paw-left { transform: translate(-10px, -35px) rotate(135deg); }
+.bunny.kiss #bunny-paw-right { transform: translate(10px, -35px) rotate(-135deg); }
+
 .big-heart{
   position:absolute;
   left:50%; top:42%;
@@ -1259,6 +1306,7 @@ img{ max-width:100%; display:block; }
   display:flex;
   align-items:center;
   justify-content:center;
+  transition: transform 0.3s ease;
 }
 .question-text__heart{
   width: 0.8em;
@@ -1472,7 +1520,7 @@ img{ max-width:100%; display:block; }
 }
 
 /* ============================================================
-   SCENE 6.7 — FLOWERS (NEW)
+   SCENE 6.7 — FLOWERS
    ============================================================ */
 .scene--flowers {
   flex-direction: column;
