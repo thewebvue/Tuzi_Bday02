@@ -83,7 +83,7 @@ const CONFIG = {
   treeLine1: "Happy Birthday,",
   treeLine2: "My Favorite Person",
 
-  // Scene 4 — balloons (exactly 5 works best with the layout)
+  // Scene 4 — balloons
   reasons: [
     "The way you understand me. 🤍",
     "The way you care for me. 🥺❤️",
@@ -164,11 +164,11 @@ No matter how far we go, how much time passes, or whether we talk again or not�
 
   // Scene 6.5 — "Do you love me?" bunny
   questionMessages: [
-    "Am i really your best friend?",
+    "Do you love me?",
     "Wait... are you sure?",
     "Nah that's not right...",
     "Please...?",
-    "You're breaking my heart",
+    "You're breaking my heart 🥺",
     "Okay now you're just playing...",
     "Okay, last chance..."
   ],
@@ -1057,7 +1057,9 @@ let questionResolved = false;
 function initQuestion() {
   dodgeCount = 0;
   questionResolved = false;
-  bunnyEl.classList.remove("peeking");
+  
+  bunnyEl.classList.remove("sad", "kiss");
+  
   questionTextEl.textContent = CONFIG.questionMessages[0];
   gsap.set(yesBtn, { scale: 1, xPercent: -50, yPercent: -50, x: 0, y: 0 });
   gsap.set(noBtn, { scale: 1, xPercent: -50, yPercent: -50, x: 0, y: 0, opacity: 1 });
@@ -1065,20 +1067,51 @@ function initQuestion() {
   noBtn.style.top = "50%";
   gsap.set(bigHeartEl, { scale: 0.4, opacity: 0, xPercent: -50, yPercent: -50, y: window.innerHeight * 0.65, filter: "blur(0px)" });
   gsap.set(bunnyEl, { opacity: 1, scale: 1 });
-  gsap.set(questionStage, { opacity: 1 });
-  gsap.set(questionTextEl, { opacity: 1, y: 0 });
+  gsap.set(questionStage, { opacity: 1, pointerEvents: "auto" });
+  gsap.set(questionTextEl, { opacity: 1, y: 0, scale: 1 });
+}
+
+function throwKisses(startX, startY) {
+  let kissInterval = setInterval(() => {
+    if (!questionResolved || currentKey !== "question") { clearInterval(kissInterval); return; }
+
+    const kissEl = createHeartSVG("burst-heart");
+    kissEl.style.left = startX + "px";
+    kissEl.style.top = startY + "px";
+    kissEl.style.width = "22px";
+    kissEl.style.height = "22px";
+    kissEl.style.fill = "#ff4757"; 
+    document.body.appendChild(kissEl);
+    
+    gsap.set(kissEl, { xPercent: -50, yPercent: -50, scale: 0 });
+    
+    const angleOffset = (Math.random() - 0.5) * 80;
+    
+    gsap.to(kissEl, {
+      x: angleOffset,
+      y: -80 - Math.random() * 120,
+      opacity: 0,
+      scale: 1 + Math.random() * 0.8,
+      rotation: (Math.random() - 0.5) * 60,
+      duration: 1.5 + Math.random(),
+      ease: "power1.out",
+      onComplete: () => kissEl.remove()
+    });
+  }, 250);
 }
 
 function dodgeNoButton() {
   if (questionResolved) return;
   dodgeCount++;
 
+  if (dodgeCount > 0) {
+    bunnyEl.classList.add("sad");
+  }
+
   const msgIdx = Math.min(dodgeCount, CONFIG.questionMessages.length - 1);
   questionTextEl.textContent = CONFIG.questionMessages[msgIdx];
   gsap.fromTo(questionTextEl, { opacity: 0.3, y: -6 }, { opacity: 1, y: 0, duration: 0.35 });
 
-  const stageRect = questionStage.getBoundingClientRect();
-  const margin = 30;
   const randLeftPct = 12 + Math.random() * 76;
   const randTopPct = 15 + Math.random() * 70;
   noBtn.style.left = `${randLeftPct}%`;
@@ -1092,30 +1125,46 @@ function dodgeNoButton() {
   if (dodgeCount >= CONFIG.questionMessages.length - 1) {
     gsap.to(noBtn, { opacity: 0.55, duration: 0.3 });
   }
-  void stageRect; void margin;
 }
 
 noBtn.addEventListener("pointerdown", (e) => { e.preventDefault(); dodgeNoButton(); });
 noBtn.addEventListener("mouseenter", dodgeNoButton);
 
 yesBtn.addEventListener("click", () => {
-  if (questionResolved) return;
-  questionResolved = true;
-  bunnyEl.classList.add("peeking");
+      if (questionResolved) return;
+      questionResolved = true;
+      
+      bunnyEl.classList.remove("sad");
+      bunnyEl.classList.add("kiss");
+      
+      const bunnyRect = bunnyEl.getBoundingClientRect();
+      const burstX = bunnyRect.left + bunnyRect.width * 0.5;
+      const burstY = bunnyRect.top + bunnyRect.height * 0.5;
+      const mouthX = bunnyRect.left + bunnyRect.width * 0.5;
+      const mouthY = bunnyRect.top + bunnyRect.height * 0.65;
 
-  const bunnyRect = bunnyEl.getBoundingClientRect();
-  const burstX = bunnyRect.left + bunnyRect.width * 0.5;
-  const burstY = bunnyRect.top + bunnyRect.height * 0.42;
+      // Changed 1200 to 200 to move to the galaxy scene faster
+      const tl = gsap.timeline({ onComplete: () => setTimeout(() => goToScene("galaxy"), 200) });
+      
+      tl.to([questionStage], { opacity: 0, duration: 0.35, ease: "power2.out", pointerEvents: "none" });
+      tl.call(() => {
+        questionTextEl.innerHTML = "I knew it! ❤️";
+        gsap.fromTo(questionTextEl, { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: "back.out(2)" });
+      });
+      
+      tl.to(bunnyEl, { scale: 1.1, duration: 0.4, ease: "back.out(1.5)" }, "-=0.1");
+      tl.call(() => burstHearts(burstX, burstY, 30, { spread: 200, sizeMin: 12, sizeMax: 26 }));
+      tl.call(() => throwKisses(mouthX, mouthY));
+      
+      tl.to(bigHeartEl, { opacity: 1, scale: 1, y: 0, duration: 0.75, ease: "elastic.out(1, 0.5)" }, "-=0.2");
+      
+      // Changed repeat: 3 to repeat: 1 to reduce the wait time
+      tl.to(bigHeartEl, { scale: 1.15, duration: 0.3, ease: "sine.inOut", yoyo: true, repeat: 1 }); 
+      
+      tl.to(bunnyEl, { opacity: 0, duration: 0.5, ease: "power1.in" });
+      tl.to(bigHeartEl, { scale: 16, filter: "blur(46px)", opacity: 0.9, duration: 1.0, ease: "power1.in" }, "<");
+    });
 
-  const tl = gsap.timeline({ onComplete: () => setTimeout(() => goToScene("galaxy"), 200) });
-  tl.to([questionTextEl, questionStage], { opacity: 0, duration: 0.35, ease: "power2.out" });
-  tl.to(bunnyEl, { scale: 1.06, duration: 0.4, ease: "power2.out" }, "-=0.1");
-  tl.call(() => burstHearts(burstX, burstY, 16, { spread: 140, sizeMin: 10, sizeMax: 20 }));
-  tl.to(bigHeartEl, { opacity: 1, scale: 1, y: 0, duration: 0.75, ease: "power3.out" }, "-=0.05");
-  tl.to(bigHeartEl, { scale: 1.15, duration: 0.25, ease: "sine.inOut", yoyo: true, repeat: 1 });
-  tl.to(bunnyEl, { opacity: 0, duration: 0.7, ease: "power1.in" }, "-=0.15");
-  tl.to(bigHeartEl, { scale: 16, filter: "blur(46px)", opacity: 0.9, duration: 1.3, ease: "power1.in" }, "<");
-});
 
 /* ---------------------------------------------------------
    12.6. Scene 6.6 — Galaxy of hearts
@@ -1149,6 +1198,12 @@ function initGalaxy() {
   galaxyBanner.classList.remove("visible");
   galaxyBannerText.textContent = "";
   $$(".galaxy-heart--rose").forEach((h) => h.classList.remove("collected"));
+  
+  const continueBtn = document.getElementById("galaxy-continue");
+  if (continueBtn) {
+    continueBtn.hidden = true;
+    gsap.set(continueBtn, { opacity: 0, y: 10 });
+  }
 }
 
 function startGalaxyRotation() {
@@ -1457,6 +1512,14 @@ function revealGalaxyMessage(heartEl) {
   const message = CONFIG.galaxyMessages[galaxyRevealIndex];
   galaxyRevealIndex++;
   showGalaxyBanner(message);
+
+  if (galaxyRevealIndex === 1) {
+    const continueBtn = document.getElementById("galaxy-continue");
+    if (continueBtn && continueBtn.hidden) {
+        continueBtn.hidden = false;
+        gsap.to(continueBtn, { opacity: 1, y: 0, duration: 0.5 });
+    }
+  }
 }
 
 function showGalaxyBanner(text) {
