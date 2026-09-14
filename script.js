@@ -3,16 +3,6 @@
    Everything you'd want to personalize lives in CONFIG below.
    ============================================================ */
 
-/* ---------------------------------------------------------
-   0. Safety net — if GSAP failed to load (a blocked CDN, an
-   offline viewer, a restrictive network/ad-blocker), every
-   scene below would throw on its first gsap call and stay
-   blank. This installs a tiny fallback with the same API
-   surface used in this file: it jumps straight to each
-   animation's end state instead of animating, so the tree,
-   cake, and every other scene still render — just without
-   the fancy motion — rather than disappearing entirely.
-   --------------------------------------------------------- */
 if (typeof window.gsap === "undefined") {
   const resolveTargets = (target) => {
     if (typeof target === "string") return Array.from(document.querySelectorAll(target));
@@ -102,8 +92,7 @@ const CONFIG = {
     "The memories we created together. ❤️"
   ],
 
-  // Scene 5 — gallery. Add "image: 'path/to/photo.jpg'" to any
-  // entry to use a real photo instead of the gradient placeholder.
+  // Scene 5 — gallery
   photos: [
     { caption: "The moment everything changed. ✨🥺", colors: ["#f6c9d9", "#e8a1bd"], image: "image/z.jpeg" },
     { caption: "Where my best days began. ❤️", colors: ["#f6d9c9", "#e8a6a1"], image: "image/a.jpeg" },
@@ -143,7 +132,7 @@ const CONFIG = {
     { icon: "🎬", label: "Our Favorite Movie", caption: "Watched a hundred times", type: "video", src: "movie_vid.mp4", colors: ["#cbb3e0", "#8a5fc9"] },
     { icon: "🎵", label: "Our Song", caption: "Plays in my head, always", type: "video", src: "song_vid.mp4", colors: ["#e0a3c4", "#c9527f"] },
     { icon: "🐾", label: "Our Favorite Animal", caption: "The cutest one", type: "video", src: "animal_vid.mp4", colors: ["#d4c4b7", "#8c7b6e"] },
-    { icon: "🏍️", label: "Our Favorite Bike", caption: "Late night rides", type: "video", src: "bike_vid.mp4", colors: ["#a3b8cc", "#4a6278"] }
+    { icon: "🏍️", label: "Our Favorite Bike", caption: "Late night rides", type: "video", src: "bike_video.mp4", colors: ["#a3b8cc", "#4a6278"] }
   ],
 
   // Scene 6 — letter
@@ -184,7 +173,7 @@ No matter how far we go, how much time passes, or whether we talk again or not�
     "Okay, last chance..."
   ],
 
-  // Scene 6.6 — galaxy of hearts (exactly 10 — one per rose heart)
+  // Scene 6.6 — galaxy of hearts
   galaxyMessages: [
 "Every little thing around me somehow reminds me of you.",
 "You’re the person I’d always choose to see smile.",
@@ -205,7 +194,7 @@ No matter how far we go, how much time passes, or whether we talk again or not�
 /* ---------------------------------------------------------
    2. Scene order & shared state
    --------------------------------------------------------- */
-const SCENES = ["intro", "heart", "tree", "balloons", "gallery", "cake", "letter", "question", "galaxy", "finale"];
+const SCENES = ["intro", "heart", "tree", "balloons", "gallery", "cake", "letter", "question", "galaxy", "flowers", "finale"];
 let currentKey = "intro";
 let gallerySwiperInstance = null;
 let heartReleased = false;
@@ -219,8 +208,6 @@ const $ = (sel, scope = document) => scope.querySelector(sel);
 const $$ = (sel, scope = document) => Array.from(scope.querySelectorAll(sel));
 const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
-// A real heart shape drawn as SVG, used everywhere instead of the "♥" text
-// character
 const HEART_PATH_D = "M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35Z";
 function createHeartSVG(className) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -243,7 +230,7 @@ window.addEventListener("orientationchange", setVH);
 setVH();
 
 /* ---------------------------------------------------------
-   4. Ambient night-sky canvas (stars + drifting gold embers)
+   4. Ambient night-sky canvas
    --------------------------------------------------------- */
 function initSky() {
   const canvas = document.getElementById("sky-canvas");
@@ -382,6 +369,10 @@ function goToScene(key) {
 
   if (currentKey === "cake" && key !== "cake") stopCakeSparkles();
   if (currentKey === "galaxy" && key !== "galaxy") stopGalaxyDrag();
+  if (currentKey === "flowers" && key !== "flowers") {
+      clearInterval(flowerInterval);
+      flowersInitialized = false;
+  }
 
   currentKey = key;
   updateProgressDots(key);
@@ -412,6 +403,7 @@ function runSceneEnter(key) {
   else if (key === "letter") initLetter();
   else if (key === "question") initQuestion();
   else if (key === "galaxy") initGalaxy();
+  else if (key === "flowers") initFlowers();
   else if (key === "finale") initFinale();
 }
 
@@ -436,23 +428,22 @@ const musicBtn = document.getElementById("music-btn");
 let musicStarted = false;
 let musicMuted = false;
 
-function startMusicOnce() {
-  if (musicStarted) return;
+const MUSIC_START_EVENTS = ["pointerdown", "touchend", "click", "keydown"];
+
+function attemptStartMusic() {
+  if (musicStarted || musicMuted) return;
   bgAudio.volume = 0.55;
-  bgAudio.play().then(() => {
-    musicStarted = true;
-    document.removeEventListener("pointerdown", startMusicOnce);
-  }).catch(() => {});
+  const playPromise = bgAudio.play();
+  if (playPromise && typeof playPromise.then === "function") {
+    playPromise.then(() => {
+      musicStarted = true;
+      MUSIC_START_EVENTS.forEach((evt) => document.removeEventListener(evt, attemptStartMusic));
+    }).catch(() => {});
+  }
 }
 
-// Try auto-playing immediately
-bgAudio.volume = 0.55;
-bgAudio.play().then(() => {
-  musicStarted = true;
-}).catch(() => {
-  // Wait for user interaction if auto-play is blocked
-  document.addEventListener("pointerdown", startMusicOnce);
-});
+attemptStartMusic();
+MUSIC_START_EVENTS.forEach((evt) => document.addEventListener(evt, attemptStartMusic, { passive: true }));
 
 musicBtn.addEventListener("click", () => {
   musicMuted = !musicMuted;
@@ -460,8 +451,8 @@ musicBtn.addEventListener("click", () => {
   if (musicMuted) {
     bgAudio.pause();
   } else {
-    startMusicOnce();
-    bgAudio.play().catch(() => {});
+    musicStarted = false;
+    attemptStartMusic();
   }
 });
 
@@ -687,6 +678,12 @@ function initBalloons() {
   wrap.innerHTML = "";
   poppedCount = 0;
 
+  const continueBtn = document.getElementById("balloons-continue");
+  if (continueBtn) {
+    continueBtn.hidden = true;
+    gsap.set(continueBtn, { opacity: 0, y: 10 });
+  }
+
   const zoneWidth = 100 / CONFIG.reasons.length;
   CONFIG.reasons.forEach((reason, i) => {
     const btn = document.createElement("button");
@@ -721,13 +718,16 @@ function showReason(i) {
   document.getElementById("reason-text").textContent = CONFIG.reasons[i];
   document.getElementById("reason-overlay").classList.add("visible");
 }
+
 document.getElementById("reason-close").addEventListener("click", () => {
   document.getElementById("reason-overlay").classList.remove("visible");
-  if (poppedCount >= CONFIG.reasons.length) {
-    setTimeout(() => {
-      const idx = SCENES.indexOf("balloons");
-      if (idx > -1 && idx < SCENES.length - 1) goToScene(SCENES[idx + 1]);
-    }, 350);
+  
+  if (poppedCount >= 2) {
+      const continueBtn = document.getElementById("balloons-continue");
+      if (continueBtn && continueBtn.hidden) {
+          continueBtn.hidden = false;
+          gsap.to(continueBtn, { opacity: 1, y: 0, duration: 0.5 });
+      }
   }
 });
 
@@ -735,10 +735,22 @@ document.getElementById("reason-close").addEventListener("click", () => {
    11. Scene 5 — Polaroid gallery (Swiper cards effect)
    --------------------------------------------------------- */
 function initGallery() {
+  const continueBtn = document.getElementById("gallery-continue");
+  
   if (gallerySwiperInstance) {
     gallerySwiperInstance.slideTo(0, 0);
+    if (continueBtn) {
+      continueBtn.hidden = true;
+      gsap.set(continueBtn, { opacity: 0, y: 10 });
+    }
     return;
   }
+  
+  if (continueBtn) {
+    continueBtn.hidden = true;
+    gsap.set(continueBtn, { opacity: 0, y: 10 });
+  }
+
   const wrapper = document.getElementById("gallery-wrapper");
   CONFIG.photos.forEach((photo) => {
     const slide = document.createElement("div");
@@ -748,7 +760,6 @@ function initGallery() {
       : `<svg class="polaroid__icon" viewBox="0 0 24 22"><path d="${HEART_PATH_D}"></path></svg>`;
     const bg = photo.image ? "" : `style="background:linear-gradient(155deg, ${photo.colors[0]}, ${photo.colors[1]})"`;
     
-    // Date tag entirely removed per instructions
     slide.innerHTML = `
       <div class="polaroid__photo" ${bg}>${photoInner}</div>
       <p class="polaroid__caption">${photo.caption}</p>`;
@@ -760,10 +771,22 @@ function initGallery() {
       effect: "cards",
       grabCursor: true,
       cardsEffect: { perSlideOffset: 10, perSlideRotate: 4, slideShadows: false },
-      touchEventsTarget: "container"
+      touchEventsTarget: "container",
+      on: {
+        slideChange: function (swiper) {
+          if (swiper.activeIndex >= 2 && continueBtn && continueBtn.hidden) {
+            continueBtn.hidden = false;
+            gsap.to(continueBtn, { opacity: 1, y: 0, duration: 0.5 });
+          }
+        }
+      }
     });
   } else {
     gallerySwiperInstance = { slideTo() {} };
+    if (continueBtn) {
+      continueBtn.hidden = false;
+      gsap.set(continueBtn, { opacity: 1, y: 0 });
+    }
   }
 }
 
@@ -805,6 +828,12 @@ function startTopperSway(flagEl) {
 }
 
 function initCake() {
+  const cakeContinue = document.getElementById("cake-continue");
+  if (cakeContinue) {
+      cakeContinue.hidden = true;
+      gsap.set(cakeContinue, { opacity: 0, y: 10 });
+  }
+
   document.getElementById("cake-message").textContent = CONFIG.cakeMessage;
   document.getElementById("cake-topper-flag").textContent = CONFIG.cakeTopperText;
   buildFilmstrip();
@@ -932,6 +961,13 @@ function openFavModal(fav) {
   media.innerHTML = "";
   if (fav.src && fav.type === "video") {
     media.innerHTML = `<video src="${fav.src}" controls autoplay playsinline></video>`;
+    
+    // Unhide the Cake Continue button if a video is clicked
+    const cakeContinue = document.getElementById("cake-continue");
+    if (cakeContinue && cakeContinue.hidden) {
+        cakeContinue.hidden = false;
+        gsap.fromTo(cakeContinue, {opacity: 0, y: 10}, {opacity: 1, y: 0, duration: 0.5});
+    }
   } else if (fav.src) {
     media.innerHTML = `<img src="${fav.src}" alt="${fav.label}">`;
   } else {
@@ -1436,6 +1472,159 @@ function showGalaxyBanner(text) {
     galaxyBannerText.appendChild(caret);
     if (idx >= text.length) clearInterval(galaxyBannerTypeId);
   }, 26);
+}
+
+/* ============================================================
+   SCENE 6.7 — DIGITAL FLOWERS
+   ============================================================ */
+
+let currentFlowerStyle = 0;
+let flowerInterval = null;
+let flowersInitialized = false;
+
+function initFlowers() {
+  if (flowersInitialized) return;
+  flowersInitialized = true;
+  currentFlowerStyle = 0;
+
+  const continueBtn = document.getElementById("flowers-continue");
+  if (continueBtn) {
+      continueBtn.hidden = true;
+      gsap.set(continueBtn, {opacity: 0, y: 10});
+  }
+
+  playNextBouquet();
+
+  flowerInterval = setInterval(() => {
+      const svg = document.getElementById('flower-scene-svg');
+      if (svg) svg.style.opacity = 0;
+      setTimeout(playNextBouquet, 500); 
+  }, 7500);
+}
+
+function getSunflowerHTML() {
+  let petals = '';
+  for(let i=0; i<14; i++) petals += `<ellipse cx="0" cy="-35" rx="10" ry="40" fill="#FFD700" transform="rotate(${i * (360/14)})" />`;
+  for(let i=0; i<14; i++) petals += `<ellipse cx="0" cy="-25" rx="8" ry="30" fill="#FFA500" transform="rotate(${i * (360/14) + 12})" />`;
+  petals += `<circle cx="0" cy="0" r="24" fill="#5C4033" /><circle cx="0" cy="0" r="18" fill="#3e2723" />`;
+  return petals;
+}
+
+function getTulipHTML() {
+  return `<path d="M 0,25 C -45,15 -45,-45 -25,-60 C -15,-35 0,-15 0,25" fill="#d80032" />
+          <path d="M 0,25 C 45,15 45,-45 25,-60 C 15,-35 0,-15 0,25" fill="#ff0033" />
+          <path d="M -25,-45 C 0,-75 25,-45 25,-15 C 0,15 -25,-15 -25,-45" fill="#aa0000" />`;
+}
+
+function getLilyHTML() {
+  let petals = '';
+  for(let i=0; i<6; i++) petals += `<path d="M 0,15 C -25,-20 -15,-65 0,-85 C 15,-65 25,-20 0,15" fill="#ffffff" transform="rotate(${i * 60})" />`;
+  for(let i=0; i<5; i++) petals += `<line x1="0" y1="0" x2="0" y2="-40" stroke="#ffcc00" stroke-width="2.5" transform="rotate(${i * 72 + 15})" />
+          <circle cx="0" cy="-40" r="4" fill="#ff9900" transform="rotate(${i * 72 + 15})" />`;
+  return petals;
+}
+
+function getFlowerStyleData(type) {
+  if (type === 0) {
+      return { stemColor: '#4a7c29', stemWidth: 7, leafHTML: `<path d="M 0,0 C -20,-15 -25,-40 0,-60 C 25,-40 20,-15 0,0" fill="#4a7c29" /><path d="M 0,0 Q -5,-30 0,-55" stroke="#2d4f19" stroke-width="2" fill="none" />`, headHTML: getSunflowerHTML() };
+  } else if (type === 1) {
+      return { stemColor: '#7cb342', stemWidth: 8, leafHTML: `<path d="M 0,0 C -10,-30 -5,-70 0,-90 C 5,-70 10,-30 0,0" fill="#689f38" />`, headHTML: getTulipHTML() };
+  } else if (type === 2) {
+      return { stemColor: '#1b5e20', stemWidth: 5, leafHTML: `<path d="M 0,0 C -15,-25 -15,-55 0,-75 C 5,-40 5,-20 0,0" fill="#1b5e20" />`, headHTML: getLilyHTML() };
+  }
+}
+
+function buildBouquetSVG(styleIndex) {
+  const standardTargets = [{x: 250, y: 450}, {x: 350, y: 280}, {x: 500, y: 180}, {x: 650, y: 280}, {x: 750, y: 450}];
+  const mixedTargets = [{x: 180, y: 520}, {x: 280, y: 350}, {x: 400, y: 200}, {x: 500, y: 140}, {x: 600, y: 200}, {x: 720, y: 350}, {x: 820, y: 520}, {x: 350, y: 460}, {x: 650, y: 460}];
+  const mixedBouquetMap = [1, 2, 0, 2, 0, 1, 2, 0, 1]; 
+
+  const targets = (styleIndex === 3) ? mixedTargets : standardTargets;
+  let svgContent = '';
+  let delayBase = 0.2;
+  
+  targets.forEach((target, index) => {
+      let flowerType = (styleIndex === 3) ? mixedBouquetMap[index] : styleIndex;
+      let flowerData = getFlowerStyleData(flowerType);
+
+      const startX = 500;
+      const startY = 1000;
+      const endX = target.x;
+      const endY = target.y;
+      
+      const cx1 = 500 + (endX - 500) * 0.2;
+      const cy1 = 800;
+      const cx2 = endX - (endX - 500) * 0.1;
+      const cy2 = endY + 200;
+      
+      const pathD = `M ${startX} ${startY} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${endX} ${endY}`;
+      
+      svgContent += `<path class="flower-stem" d="${pathD}" pathLength="100" style="stroke: ${flowerData.stemColor}; stroke-width: ${flowerData.stemWidth}; --delay: ${delayBase}s;" />`;
+      
+      for (let t = 0.3; t <= 0.8; t += 0.25) {
+          const lx = Math.pow(1-t, 3)*startX + 3*Math.pow(1-t, 2)*t*cx1 + 3*(1-t)*Math.pow(t, 2)*cx2 + Math.pow(t, 3)*endX;
+          const ly = Math.pow(1-t, 3)*startY + 3*Math.pow(1-t, 2)*t*cy1 + 3*(1-t)*Math.pow(t, 2)*cy2 + Math.pow(t, 3)*endY;
+          
+          const centerPoint = targets.length / 2;
+          const angle = (index < centerPoint) ? -30 - Math.random()*20 : (index >= centerPoint) ? 30 + Math.random()*20 : (t === 0.55 ? 45 : -45);
+          const leafDelay = delayBase + (t * 1.5);
+          
+          svgContent += `
+          <g transform="translate(${lx}, ${ly}) rotate(${angle})">
+              <g class="flower-leaf" style="--delay: ${leafDelay}s;">
+                  ${flowerData.leafHTML}
+              </g>
+          </g>`;
+      }
+      
+      const headDelay = delayBase + 1.8 + Math.random()*0.4;
+      svgContent += `
+      <g transform="translate(${endX}, ${endY})">
+          <g class="flower-head-group" style="--delay: ${headDelay}s;">
+              ${flowerData.headHTML}
+          </g>
+      </g>`;
+  });
+  
+  return svgContent;
+}
+
+function playNextBouquet() {
+  if (currentKey !== "flowers") return;
+
+  const sceneSvg = document.getElementById('flower-scene-svg');
+  const sparklesContainer = document.getElementById('flower-sparkles-container');
+  
+  if(sceneSvg) {
+      sceneSvg.innerHTML = buildBouquetSVG(currentFlowerStyle);
+      sceneSvg.style.opacity = 1;
+  }
+  
+  setTimeout(() => {
+      if (currentKey !== "flowers") return;
+      if (sparklesContainer) {
+          sparklesContainer.innerHTML = ''; 
+          for(let i = 0; i < 50; i++) {
+              let sp = document.createElement('div');
+              sp.className = 'flower-sparkle';
+              sp.style.left = (20 + Math.random()*60) + '%';
+              sp.style.top = (20 + Math.random()*50) + '%';
+              sp.style.animationDelay = (Math.random() * 1.5) + 's';
+              sparklesContainer.appendChild(sp);
+          }
+      }
+  }, 2200);
+
+  // Show continue button when the 2nd style (index 1: Tulips) triggers
+  if (currentFlowerStyle === 1) {
+      const continueBtn = document.getElementById("flowers-continue");
+      if (continueBtn && continueBtn.hidden) {
+          continueBtn.hidden = false;
+          gsap.to(continueBtn, { opacity: 1, y: 0, duration: 0.5, delay: 2.2 });
+      }
+  }
+  
+  currentFlowerStyle = (currentFlowerStyle + 1) % 4;
 }
 
 /* ---------------------------------------------------------
