@@ -268,52 +268,113 @@
   <!-- ===================== SCENE 6.5 — DO YOU LOVE ME? (BUNNY) ===================== -->
   <section class="scene scene--question" id="scene-question" data-scene="question">
     <div class="scene-inner question-scene-inner">
+      
+      <!-- ATTRACTIVE KAWAII BUNNY -->
       <div class="bunny" id="bunny" aria-hidden="true">
-        <svg class="bunny-svg" viewBox="0 0 120 118">
-          <defs>
-            <linearGradient id="bunnyHeadGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#fff8ef"/>
-              <stop offset="100%" stop-color="#f6d9c9"/>
-            </linearGradient>
-            <linearGradient id="bunnyEarOuterGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#fff8ef"/>
-              <stop offset="100%" stop-color="#f2c2d4"/>
-            </linearGradient>
-            <linearGradient id="bunnyPawGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ffffff"/>
-              <stop offset="100%" stop-color="#f7d7e2"/>
-            </linearGradient>
-          </defs>
+        <!-- Sprite wrapper for body animations -->
+        <div class="bunny-sprite" id="bunny-sprite">
+          <svg class="bunny-svg bunny-glow" viewBox="0 0 200 200">
+            <defs>
+              <linearGradient id="earGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="100%" stop-color="#ffe6ea"/>
+              </linearGradient>
+              <linearGradient id="innerEar" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ffb3c6"/>
+                <stop offset="100%" stop-color="#ff8fa3"/>
+              </linearGradient>
+              <linearGradient id="bodyGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="100%" stop-color="#ffeaef"/>
+              </linearGradient>
+            </defs>
 
-          <path class="bunny-ear-outer" d="M41,32 C29,-6 14,-11 23,23 C27,40 37,49 44,42 Z"></path>
-          <path class="bunny-ear-outer" d="M79,32 C91,-6 106,-11 97,23 C93,40 83,49 76,42 Z"></path>
-          <path class="bunny-ear-inner" d="M40,28 C33,3 23,-1 29,22 C32,33 38,39 42,34 Z"></path>
-          <path class="bunny-ear-inner" d="M80,28 C87,3 97,-1 91,22 C88,33 82,39 78,34 Z"></path>
+            <!-- Tear Puddle (Behind bunny) -->
+            <ellipse class="bunny-puddle" cx="100" cy="180" rx="0" ry="10" fill="#74b9ff" opacity="0"/>
 
-          <ellipse class="bunny-head" cx="60" cy="70" rx="47" ry="43"></ellipse>
-          <ellipse class="bunny-highlight" cx="40" cy="46" rx="11" ry="6.5"></ellipse>
+            <!-- Left Ear Group -->
+            <g class="bunny-ear-l">
+              <path d="M70,90 C40,20 65,0 90,50" fill="url(#earGradient)" stroke="#ffccd5" stroke-width="3" stroke-linecap="round"/>
+              <path d="M75,80 C55,30 70,15 86,55" fill="url(#innerEar)"/>
+            </g>
+            
+            <!-- Right Ear Group -->
+            <g class="bunny-ear-r">
+              <path d="M130,90 C160,20 135,0 110,50" fill="url(#earGradient)" stroke="#ffccd5" stroke-width="3" stroke-linecap="round"/>
+              <path d="M125,80 C145,30 130,15 114,55" fill="url(#innerEar)"/>
+            </g>
 
-          <ellipse class="bunny-blush" cx="23" cy="82" rx="8.5" ry="5.5"></ellipse>
-          <ellipse class="bunny-blush" cx="97" cy="82" rx="8.5" ry="5.5"></ellipse>
-          <path class="bunny-eye-closed" d="M32,66 Q43,58 54,66"></path>
-          <path class="bunny-eye-closed" d="M66,66 Q77,58 88,66"></path>
+            <!-- Head -->
+            <ellipse cx="100" cy="115" rx="65" ry="52" fill="url(#bodyGradient)" stroke="#ffccd5" stroke-width="3"/>
 
-          <g class="bunny-paw-group" id="bunny-paw-left">
-            <path class="bunny-paw" d="M47,60 C48,45 32,44 27,59 C22,74 25,96 46,96 C53,96 53,72 47,60 Z"></path>
-            <path class="bunny-paw-seam" d="M33,70 Q38,75 34,84"></path>
-          </g>
-          <g class="bunny-paw-group" id="bunny-paw-right">
-            <path class="bunny-paw" d="M73,60 C72,45 88,44 93,59 C98,74 95,96 74,96 C67,96 67,72 73,60 Z"></path>
-            <path class="bunny-paw-seam" d="M87,70 Q82,75 86,84"></path>
-          </g>
+            <!-- Blush -->
+            <ellipse cx="55" cy="125" rx="12" ry="6" fill="#ff8fa3" opacity="0.6"/>
+            <ellipse cx="145" cy="125" rx="12" ry="6" fill="#ff8fa3" opacity="0.6"/>
 
-          <ellipse class="bunny-nose" cx="60" cy="90" rx="4.2" ry="3.2"></ellipse>
-        </svg>
+            <!-- Cute Nose -->
+            <circle cx="100" cy="120" r="3" fill="#ff6b81"/>
+
+            <!-- 1. DEFAULT OPEN EYES & SMILE -->
+            <g class="bunny-eyes-open">
+              <circle cx="70" cy="110" r="10" fill="#2b2b2b"/>
+              <circle cx="66" cy="106" r="4" fill="#ffffff"/>
+              <circle cx="74" cy="112" r="1.5" fill="#ffffff"/>
+              
+              <circle cx="130" cy="110" r="10" fill="#2b2b2b"/>
+              <circle cx="126" cy="106" r="4" fill="#ffffff"/>
+              <circle cx="134" cy="112" r="1.5" fill="#ffffff"/>
+            </g>
+            <path class="bunny-mouth-smile" d="M90,128 Q100,136 110,128" fill="none" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round"/>
+
+            <!-- 2. SOFT, INNOCENT SAD STATE (Dodging NO) -->
+            <g class="bunny-eyes-sad">
+              <!-- Big Watery Eyes -->
+              <circle cx="70" cy="110" r="12" fill="#2b2b2b"/>
+              <circle cx="67" cy="105" r="5" fill="#ffffff"/>
+              <circle cx="74" cy="114" r="2.5" fill="#ffffff"/>
+              <circle cx="65" cy="113" r="1" fill="#ffffff"/>
+              
+              <circle cx="130" cy="110" r="12" fill="#2b2b2b"/>
+              <circle cx="127" cy="105" r="5" fill="#ffffff"/>
+              <circle cx="134" cy="114" r="2.5" fill="#ffffff"/>
+              <circle cx="125" cy="113" r="1" fill="#ffffff"/>
+              
+              <!-- Sad, innocent eyebrows -->
+              <path d="M 58,105 Q 68,96 78,100" fill="none" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round"/>
+              <path d="M 122,100 Q 132,96 142,105" fill="none" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round"/>
+            </g>
+            <!-- Tiny Delicate Sad Mouth -->
+            <path class="bunny-mouth-sad" d="M 96,131 Q 100,128 104,131" fill="none" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round"/>
+            
+            <!-- Flowing Tears -->
+            <g class="bunny-tears">
+              <path class="tear-stream" d="M70,122 L70,170" fill="none" stroke="#a2cffe" stroke-width="3" stroke-linecap="round"/>
+              <path class="tear-stream" d="M130,122 L130,170" fill="none" stroke="#a2cffe" stroke-width="3" stroke-linecap="round"/>
+            </g>
+
+            <!-- 3. HAPPY KISSING STATE (YES Clicked) -->
+            <g class="bunny-eyes-kiss">
+              <path d="M58,110 Q70,98 82,110" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"/>
+              <path d="M118,110 Q130,98 142,110" fill="none" stroke="#2b2b2b" stroke-width="3.5" stroke-linecap="round"/>
+            </g>
+            <path class="bunny-mouth-kiss" d="M100,125 C96,125 94,128 94,131 C94,134 100,138 100,138 C100,138 106,134 106,131 C106,128 104,125 100,125 Z" fill="#ff4757"/>
+
+            <!-- Paws -->
+            <g class="bunny-paw-group" id="bunny-paw-left">
+              <ellipse cx="75" cy="158" rx="18" ry="12" fill="#ffffff" stroke="#ffccd5" stroke-width="3"/>
+            </g>
+            <g class="bunny-paw-group" id="bunny-paw-right">
+              <ellipse cx="125" cy="158" rx="18" ry="12" fill="#ffffff" stroke="#ffccd5" stroke-width="3"/>
+            </g>
+          </svg>
+        </div> <!-- End sprite wrapper -->
+        
+        <!-- Big Bursting Heart that appears -->
         <svg class="big-heart" id="big-heart" viewBox="0 0 24 22" aria-hidden="true">
           <defs>
             <linearGradient id="bigHeartGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" style="stop-color:var(--color-blush)"></stop>
-              <stop offset="100%" style="stop-color:var(--color-rose)"></stop>
+              <stop offset="0%" stop-color="#ff758c"></stop>
+              <stop offset="100%" stop-color="#ff7eb3"></stop>
             </linearGradient>
           </defs>
           <path fill="url(#bigHeartGrad)" d="M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35Z"></path>
@@ -379,7 +440,7 @@
     <div class="galaxy-ui">
       <h2 class="scene-title">A Universe of Us</h2>
       <p class="scene-subtitle">Drag to explore the stars &middot; tap a rose heart</p>
-      <button class="btn btn--outline scene-continue" data-next type="button">Continue</button>
+      <button class="btn btn--outline scene-continue" id="galaxy-continue" data-next type="button" hidden>Continue</button>
     </div>
   </section>
 
