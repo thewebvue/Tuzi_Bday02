@@ -27,7 +27,7 @@
 </head>
 <body>
 
-<!-- Shared heart clip-path (objectBoundingBox = scales to any element automatically) -->
+<!-- Shared heart clip-path -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <clipPath id="heartClip" clipPathUnits="objectBoundingBox">
@@ -48,7 +48,7 @@
   </defs>
 </svg>
 
-<!-- Ambient night-sky canvas: stars + drifting gold embers, sits behind everything -->
+<!-- Ambient night-sky canvas -->
 <canvas id="sky-canvas" aria-hidden="true"></canvas>
 
 <!-- Progress dots -->
@@ -74,7 +74,7 @@
 <!-- Toast for share/copy feedback -->
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<!-- Favorite-memory modal (opened from the filmstrip below the cake) -->
+<!-- Favorite-memory modal -->
 <div class="fav-modal" id="fav-modal">
   <div class="fav-modal__backdrop" id="fav-modal-backdrop"></div>
   <div class="fav-modal__panel" role="dialog" aria-modal="true" aria-labelledby="fav-modal-title">
@@ -90,7 +90,7 @@
   <!-- ===================== SCENE 1 — INTRO / UNWRAP ===================== -->
   <section class="scene scene--intro active" id="scene-intro" data-scene="intro">
     <div class="scene-inner intro__content">
-      <p class="intro__message">A little something for <span class="name-highlight" id="intro-name">Tuzi ❤️</span></p>
+      <p class="intro__message">A little something for <span class="name-highlight" id="intro-name">Arina</span></p>
 
       <button class="envelope" id="envelope" type="button" aria-label="Open the gift">
         <span class="envelope__glow"></span>
@@ -157,6 +157,8 @@
       <p class="scene-subtitle" id="balloons-subtitle">Each one holds a reason you're loved</p>
 
       <div class="balloons" id="balloons-wrap"></div>
+      
+      <button class="btn btn--outline scene-continue" id="balloons-continue" data-next type="button" hidden>Continue</button>
     </div>
 
     <!-- Reason reveal card -->
@@ -179,7 +181,7 @@
         <div class="swiper-wrapper" id="gallery-wrapper"></div>
       </div>
 
-      <button class="btn btn--outline scene-continue" data-next type="button">Continue</button>
+      <button class="btn btn--outline scene-continue" id="gallery-continue" data-next type="button" hidden>Continue</button>
     </div>
   </section>
 
@@ -225,7 +227,7 @@
         <div class="cake-glow"></div>
       </div>
 
-      <p class="cake-message" id="cake-message">Happy Birthday, Tuzi ❤️ 🎂</p>
+      <p class="cake-message" id="cake-message">Happy Birthday, Arina 🎂</p>
 
       <div class="favorites-section" id="favorites-section">
         <h3 class="favorites-title">A Few More Things We Love</h3>
@@ -234,7 +236,7 @@
         </div>
       </div>
 
-      <button class="btn btn--outline scene-continue" data-next type="button">Continue</button>
+      <button class="btn btn--outline scene-continue" id="cake-continue" data-next type="button" hidden>Continue</button>
     </div>
   </section>
 
@@ -254,7 +256,7 @@
         <p class="letter-hint" id="letter-hint">Tap the seal to open</p>
 
         <div class="letter-paper" id="letter-paper">
-          <p class="letter-paper__salutation" id="letter-to">Dear Tuzi ❤️,</p>
+          <p class="letter-paper__salutation" id="letter-to">Dear Arina,</p>
           <p class="letter-paper__body" id="letter-body"></p>
           <p class="letter-paper__sign" id="letter-sign"></p>
           <button class="btn btn--outline scene-continue" id="letter-continue" data-next type="button" hidden>Continue</button>
@@ -381,6 +383,18 @@
     </div>
   </section>
 
+  <!-- ===================== SCENE 6.7 — FLOWERS (NEW) ===================== -->
+  <section class="scene scene--flowers" id="scene-flowers" data-scene="flowers">
+      <h2 class="scene-title flower-scene-title">Love you Tuzi 🐰</h2>
+      <div id="flower-container">
+          <svg id="flower-scene-svg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMax meet"></svg>
+          <div id="flower-sparkles-container"></div>
+      </div>
+      <div class="flower-ui">
+          <button class="btn btn--outline scene-continue" id="flowers-continue" data-next type="button" hidden>Continue</button>
+      </div>
+  </section>
+
   <!-- ===================== SCENE 7 — GRAND FINALE ===================== -->
   <section class="scene scene--finale" id="scene-finale" data-scene="finale">
     <div class="finale-card" id="finale-card">
@@ -401,7 +415,7 @@
 
       <p class="finale-card__badge">
         <span class="finale-card__star">★</span>
-        <span id="finale-badge-text">Tuzi ❤️</span>
+        <span id="finale-badge-text">Arina</span>
         <span class="finale-card__star">★</span>
       </p>
 
