@@ -215,18 +215,17 @@ img{ max-width:100%; display:block; }
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   line-height:1;
   color: var(--color-text);
   background: rgba(10,5,18,0.4);
   border: 1px solid rgba(248,236,236,0.25);
   backdrop-filter: blur(4px);
   opacity: 0.85;
-  transition: opacity .3s ease, background .2s ease, transform .3s var(--ease-soft);
+  transition: opacity .3s ease, background .2s ease, color .2s ease;
 }
 .music-btn:hover{ opacity:1; background: rgba(10,5,18,0.6); }
 .music-btn:active{ transform: translateY(-50%) scale(0.92); }
-.music-btn.muted{ opacity: 0.5; }
 .music-btn__icon{
   width: 19px;
   height: 19px;
@@ -403,9 +402,9 @@ img{ max-width:100%; display:block; }
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-.tree-scene-inner::-webkit-scrollbar{ display: none; }
-
+.tree-scene-inner::-webkit-scrollbar{ display: none; width: 0; height: 0; }
 .tree-svg{ width:100%; height:100%; overflow:visible; }
 .leaf-heart{
   transform-box: fill-box;
@@ -561,6 +560,14 @@ img{ max-width:100%; display:block; }
   margin-top: 12px;
   text-align:center;
 }
+.polaroid__date{
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: #8a7a6a;
+  text-align:center;
+  margin-top: 2px;
+}
 
 /* ============================================================
    SCENE 5.5 — CAKE + FAVORITE THINGS
@@ -570,11 +577,10 @@ img{ max-width:100%; display:block; }
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding-block: 0.5rem 1.5rem;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(230,181,102,0.4) transparent;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-.cake-scene-inner::-webkit-scrollbar{ width: 5px; }
-.cake-scene-inner::-webkit-scrollbar-thumb{ background: rgba(230,181,102,0.35); border-radius: 4px; }
+.cake-scene-inner::-webkit-scrollbar{ display: none; width: 0; height: 0; }
 
 .cake{
   position: relative;
@@ -981,7 +987,12 @@ img{ max-width:100%; display:block; }
 .fav-modal__panel{
   position:relative;
   width:100%;
-  max-width: 380px;
+  max-width: 420px;
+  max-height: 92vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   background: linear-gradient(165deg, rgba(58,16,48,0.95), rgba(20,9,26,0.98));
   border: 1px solid rgba(230,181,102,0.4);
   border-radius: 18px;
@@ -992,6 +1003,7 @@ img{ max-width:100%; display:block; }
   transition: transform .35s var(--ease-soft);
 }
 .fav-modal.visible .fav-modal__panel{ transform: scale(1); }
+.fav-modal__panel::-webkit-scrollbar{ display: none; width: 0; height: 0; }
 .fav-modal__close{
   position:absolute;
   top: 10px; right: 10px;
@@ -1003,22 +1015,24 @@ img{ max-width:100%; display:block; }
   display:flex; align-items:center; justify-content:center;
 }
 .fav-modal__media{
-  width: 100%;
-  min-height: 200px;
-  max-height: 65vh;
+  width: min(100%, calc(65vh * 9 / 16));
+  aspect-ratio: 9 / 16;
   border-radius: 10px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1rem;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin: 0 auto 1rem;
+  background: rgba(0,0,0,0.35);
 }
-.fav-modal__media img,
+.fav-modal__media img{
+  width:100%; height:100%;
+  object-fit: cover;
+}
 .fav-modal__media video{
-  width: 100%; 
-  height: 100%;
-  max-height: 65vh;
-  object-fit: contain; 
+  width:100%; height:100%;
+  object-fit: contain;
+  background: #000;
 }
 .fav-modal__media .fav-modal__icon{
   font-size: 3rem;
@@ -1120,7 +1134,10 @@ img{ max-width:100%; display:block; }
   transform: translateY(0);
   padding: 1.8rem 1.6rem 1.6rem;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+.letter-paper.open::-webkit-scrollbar{ display: none; width: 0; height: 0; }
 .letter-paper__salutation{
   font-family: var(--font-script);
   font-size: 1.5rem;
@@ -1455,6 +1472,97 @@ img{ max-width:100%; display:block; }
 }
 
 /* ============================================================
+   SCENE 6.7 — FLOWERS (NEW)
+   ============================================================ */
+.scene--flowers {
+  flex-direction: column;
+}
+.scene--flowers::before {
+  content: '';
+  position: absolute;
+  width: 80vmin;
+  height: 80vmin;
+  background: radial-gradient(circle, rgba(160, 20, 60, 0.25) 0%, rgba(20, 10, 30, 0.1) 50%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  pointer-events: none;
+}
+.flower-scene-title {
+  position: absolute;
+  top: 8%;
+  z-index: 10;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px #ff0055;
+  letter-spacing: 1px;
+}
+#flower-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 800px;
+  max-height: 800px;
+  z-index: 1;
+  margin-top: 10vh;
+}
+#flower-scene-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.1));
+  transition: opacity 0.5s ease-in-out;
+}
+.flower-stem {
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: flowerGrowStem 2s ease-in-out forwards;
+  animation-delay: var(--delay);
+}
+@keyframes flowerGrowStem {
+  to { stroke-dashoffset: 0; }
+}
+.flower-leaf, .flower-head-group {
+  transform: scale(0);
+  animation: flowerPopOut 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation-delay: var(--delay);
+}
+@keyframes flowerPopOut {
+  to { transform: scale(1); }
+}
+#flower-sparkles-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+.flower-sparkle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.8), 0 0 20px 5px rgba(255, 215, 0, 0.6);
+  opacity: 0;
+  animation: flowerFloatUp 2.5s ease-in-out forwards;
+}
+@keyframes flowerFloatUp {
+  0% { transform: translateY(0) scale(0); opacity: 0; }
+  20% { opacity: 1; transform: translateY(-30px) scale(1.2); }
+  80% { opacity: 0.8; transform: translateY(-120px) scale(0.8); }
+  100% { transform: translateY(-150px) scale(0); opacity: 0; }
+}
+.flower-ui {
+  position: absolute;
+  bottom: 8%;
+  z-index: 10;
+}
+
+/* ============================================================
    SCENE 7 — FINALE (bright birthday-card style)
    ============================================================ */
 .scene--finale{
@@ -1468,6 +1576,8 @@ img{ max-width:100%; display:block; }
   height: 100%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -1480,6 +1590,7 @@ img{ max-width:100%; display:block; }
     repeating-linear-gradient(90deg, rgba(58,42,47,0.05) 0 1px, transparent 1px 26px),
     linear-gradient(160deg, #fdf6ee, #fbeae2);
 }
+.finale-card::-webkit-scrollbar{ display: none; width: 0; height: 0; }
 
 .finale-card__bunting{
   position:absolute;
