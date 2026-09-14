@@ -164,7 +164,7 @@ No matter how far we go, how much time passes, or whether we talk again or notâ€
 
   // Scene 6.5 â€” "Do you love me?" bunny
   questionMessages: [
-    "Do you love me?",
+    "Are we Best friends?",
     "Wait... are you sure?",
     "Nah that's not right...",
     "Please...?",
